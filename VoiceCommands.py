@@ -490,13 +490,14 @@ def remind(timer_num):
     print("Done")
 
     #The say command seems to break the entire system sometimes, it's unclear why
-    say(timers[timer_num].get_reminder_phrase())
     r = timers[timer_num]
 
     if r.get_type() == ReminderType.Alarm:
         play_audio('alarm')
-
-    if r.get_type() == ReminderType.Alarm and r.is_repeating() == False:
+    else:
+        say(timers[timer_num].get_reminder_phrase())
+    
+    if r.get_type() == ReminderType.Alarm and r.is_repeating() == False and r in alarms[now.weekday()]:
         now = datetime.now()
         alarms[now.weekday()].remove(r)
         print("Alarm removed")
