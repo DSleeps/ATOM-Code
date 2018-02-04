@@ -496,9 +496,9 @@ def remind(timer_num):
         play_audio('alarm')
     else:
         say(timers[timer_num].get_reminder_phrase())
-    
+
+    now = datetime.now()
     if r.get_type() == ReminderType.Alarm and r.is_repeating() == False and r in alarms[now.weekday()]:
-        now = datetime.now()
         alarms[now.weekday()].remove(r)
         print("Alarm removed")
         print(alarms)
