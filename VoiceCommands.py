@@ -6,6 +6,9 @@ import pyttsx3 as ps
 from bs4 import BeautifulSoup
 import urllib3
 import time
+import pyaudio
+import wave
+import sys
 from datetime import datetime
 from datetime import date
 from datetime import timedelta
@@ -490,6 +493,9 @@ def remind(timer_num):
     say(timers[timer_num].get_reminder_phrase())
     r = timers[timer_num]
 
+    if r.get_type() == ReminderType.Alarm:
+        play_audio('alarm')
+
     if r.get_type() == ReminderType.Alarm and r.is_repeating() == False:
         now = datetime.now()
         alarms[now.weekday()].remove(r)
@@ -958,6 +964,30 @@ commands = {"say": repeat, "weather": getWeather, "temp": getWeather, "remind": 
 def say(phrase):
     engine.say(phrase)
     engine.runAndWait()
+
+def play_audio(file_name):
+    CHUNK = 1024
+
+    wf = wave.open(file_name + '.wav', 'rb')
+    p = pyaudio.PyAudio()
+
+    stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                channels=wf.getnchannels(),
+                rate=wf.getframerate(),
+                output=True)
+    data = wf.readframes(CHUNK)
+
+    while len(data) > 1:
+        stream.write(data)
+        data = wf.readframes(CHUNK)
+
+    print("Stopping")
+    stream.stop_stream()
+    stream.close()
+    print("stopped")
+
+    p.terminate()
+    print("Terminated")
 
 def listenForWord():
     with mic as source:
